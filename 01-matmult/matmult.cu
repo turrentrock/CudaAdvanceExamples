@@ -27,7 +27,6 @@ __global__ void mult(int* A,int* B,int* C) {
 }
 
 int* cudaMallocIntMatrix(int n,int m) {
-	// First Allocate Pointers to Arrays //
 	int *CM;
 	gpuErrchk(cudaMalloc(&CM, n*m*sizeof(int)))
 	return CM;

@@ -9,6 +9,7 @@ using namespace std;
 using namespace cv;
 using namespace cuda;
 
+// Handy Macro //
 ////////////////////////////////////////////////////////
 #define checkCudaErrors(call)                                 \
   do {                                                        \
@@ -42,8 +43,6 @@ __global__ void blur(int* B,int* G,int* R,
 	int k_center_row = (krows-1)/2;
 	int k_center_col = (kcols-1)/2;
 
-	//printf("%d %d\n", pixel_row , pixel_col);
-
 	for(int i=0;i<krows;i++) {
 		for(int j=0;j<kcols;j++) {
 			
@@ -72,7 +71,6 @@ __global__ void blur(int* B,int* G,int* R,
 }
 
 int* cudaMallocIntMatrix(int n,int m) {
-	// First Allocate Pointers to Arrays //
 	int *CM;
 	checkCudaErrors(cudaMalloc((void**)&CM, n*m*sizeof(int)));
 	return CM;
@@ -82,7 +80,7 @@ int main(int argc, char** argv ) {
 	// Input for image as arg //
 	if( argc != 2)
 	{
-		cout <<" Usage: display_image ImageToLoadAndDisplay" << endl;
+		cout <<" Usage: Enter image to blur." << endl;
 		return -1;
 	}
 
@@ -93,13 +91,6 @@ int main(int argc, char** argv ) {
 
 	// Allocate channels //
 	int *B,*G,*R,*RB,*RG,*RR,*K;
-	int KH[] = {1,1,1,1,1,
-			  	1,1,1,1,1,
-			  	1,1,1,1,1,
-			  	1,1,1,1,1,
-			    1,1,1,1,1};
-	int k_r=5;
-	int k_c=5;
 
 	B = cudaMallocIntMatrix(rows,cols);
 	G = cudaMallocIntMatrix(rows,cols);
@@ -108,6 +99,15 @@ int main(int argc, char** argv ) {
 	RB = cudaMallocIntMatrix(rows,cols);
 	RG = cudaMallocIntMatrix(rows,cols);
 	RR = cudaMallocIntMatrix(rows,cols);
+
+	// Filter Shape //
+	int KH[] = {1,1,1,1,1,
+				1,1,1,1,1,
+				1,1,1,1,1,
+				1,1,1,1,1,
+				1,1,1,1,1};
+	int k_r=5;
+	int k_c=5;
 
 	K  = cudaMallocIntMatrix(k_r,k_c);
 
@@ -141,10 +141,10 @@ int main(int argc, char** argv ) {
 		exit(-1);
 	}
 
-	// 	Calling Kernels to Run //
+	// Sync all threads //
 	checkCudaErrors(cudaDeviceSynchronize());
 
-	// Copy image back to guest //
+	// Copy image back to Host //
 	checkCudaErrors(cudaMemcpy(channels[0],RB,rows*cols*sizeof(int),cudaMemcpyDeviceToHost));
 	checkCudaErrors(cudaMemcpy(channels[1],RG,rows*cols*sizeof(int),cudaMemcpyDeviceToHost));
 	checkCudaErrors(cudaMemcpy(channels[2],RR,rows*cols*sizeof(int),cudaMemcpyDeviceToHost));
