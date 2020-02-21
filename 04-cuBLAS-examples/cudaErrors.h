@@ -1,4 +1,5 @@
-#ifdef CUBLAS_API_H_
+#ifndef CUDA_CUBLAS_ERROR_H_
+#define CUDA_CUBLAS_ERROR_H_
 
 #include <stdio.h>
 #include <cublas_v2.h>
