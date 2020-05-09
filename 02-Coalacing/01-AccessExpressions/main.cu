@@ -21,10 +21,10 @@ __global__ void strided_access(float* a,int s,int max){
 	a[idx*s] = a[idx*s] + 1;
 }
 
-int main(){
+int main(int argc,char** argv){
 
 	int max_threads=1024;
-	int max_blocks=128;
+	int max_blocks=1;
 	int max_mem = 2*max_threads*max_blocks;
 
 	dim3 blocks(max_blocks);
@@ -35,17 +35,25 @@ int main(){
 
 	for(int i=0;i<max_mem;i++) a[i]=0;
 
-	alligned_access<<<blocks,threads>>>(a,max_mem);
-	checkCudaErrors(cudaGetLastError());
-	checkCudaErrors(cudaDeviceSynchronize());
+	switch(argv[1][0]){
+	case '0':
+		alligned_access<<<blocks,threads>>>(a,max_mem);
+		checkCudaErrors(cudaGetLastError());
+		checkCudaErrors(cudaDeviceSynchronize());
+		break;
 
-	offset_access<<<blocks,threads>>>(a,1,max_mem);
-	checkCudaErrors(cudaGetLastError());
-	checkCudaErrors(cudaDeviceSynchronize());
+	case '1':
+		offset_access<<<blocks,threads>>>(a,3,max_mem);
+		checkCudaErrors(cudaGetLastError());
+		checkCudaErrors(cudaDeviceSynchronize());
+		break;
 
-	strided_access<<<blocks,threads>>>(a,2,max_mem);
-	checkCudaErrors(cudaGetLastError());
-	checkCudaErrors(cudaDeviceSynchronize());
+	case '2':
+		strided_access<<<blocks,threads>>>(a,2,max_mem);
+		checkCudaErrors(cudaGetLastError());
+		checkCudaErrors(cudaDeviceSynchronize());
+		break;
+	}
 
 	checkCudaErrors(cudaFree(a));
 
