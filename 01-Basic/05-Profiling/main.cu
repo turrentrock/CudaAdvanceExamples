@@ -62,6 +62,12 @@ __global__ void Transpose_colRead_rowWrite(mat<int> t1,mat<int> t2){
 
 int main(int argc,char** argv) {
 
+	if (argc < 2) {
+		std::cout << "Not enough args" <<std::endl;
+		return;
+	}
+
+
 	/* Matrix shape nx*ny */
 
 	int n = 2048;
@@ -88,10 +94,6 @@ int main(int argc,char** argv) {
 	checkCudaErrors(cudaGetLastError());
 	checkCudaErrors(cudaDeviceSynchronize());
 
-	if (argc < 2) {
-		std::cout << "Not enough args" <<std::endl;
-		goto cleanup;
-	}
 
 	switch(argv[1][0]) {
 		case '0' : 
