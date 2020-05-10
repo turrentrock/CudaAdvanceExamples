@@ -25,7 +25,8 @@ int main(int argc,char** argv){
 
 	int max_threads=1024;
 	int max_blocks=128;
-	int max_mem = 2*max_threads*max_blocks;
+	int max_stride=10;
+	int max_mem = max_stride*max_threads*max_blocks;
 
 	dim3 blocks(max_blocks);
 	dim3 threads(max_threads);
@@ -49,7 +50,7 @@ int main(int argc,char** argv){
 		break;
 
 	case '2':
-		strided_access<<<blocks,threads>>>(a,2,max_mem);
+		strided_access<<<blocks,threads>>>(a,max_stride,max_mem);
 		checkCudaErrors(cudaGetLastError());
 		checkCudaErrors(cudaDeviceSynchronize());
 		break;
