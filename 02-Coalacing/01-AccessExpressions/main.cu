@@ -24,7 +24,7 @@ __global__ void strided_access(float* a,int s,int max){
 int main(int argc,char** argv){
 
 	int max_threads=1024;
-	int max_blocks=1;
+	int max_blocks=128;
 	int max_mem = 2*max_threads*max_blocks;
 
 	dim3 blocks(max_blocks);
