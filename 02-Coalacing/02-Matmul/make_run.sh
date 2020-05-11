@@ -6,10 +6,11 @@ nvsightFlags+='l1tex__t_bytes_pipe_lsu_mem_global_op_ld.sum.per_second,'
 nvsightFlags+='l1tex__t_sectors_pipe_lsu_mem_global_op_ld.sum,'
 nvsightFlags+='l1tex__t_bytes_pipe_lsu_mem_global_op_st.sum.per_second,'
 nvsightFlags+='l1tex__t_sectors_pipe_lsu_mem_global_op_st.sum,'
+nvsightFlags+='gpu__time_active.sum,'
 nvsightFlags+=' '
-nvsightFlags+='--set full '
+#nvsightFlags+='--set full '
 #nvsightFlags+='--set default '
-nvsightFlags+='--open-in-ui '
+#nvsightFlags+='--open-in-ui '
 
 
 echo $nvsightFlags

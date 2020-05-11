@@ -59,7 +59,7 @@ __global__ void matmul_v1(float* a,float* b,float* c, int n){
 
 int main(int argc,char** argv){
 
-	int n=2048;
+	int n=16384;
 #ifdef UNIT_TEST
 	n = 3;
 #endif

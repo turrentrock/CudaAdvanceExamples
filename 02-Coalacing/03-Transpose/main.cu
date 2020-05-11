@@ -23,14 +23,70 @@ __global__ void transpose_v1(float* a,float* b, int n){
 
 }
 
+#define BX 32
+#define BY BX
+
+__global__ void transpose_v2(float* a,float* b, int n){
+
+	int tx = threadIdx.x;
+	int ty = threadIdx.y;
+
+	int bx = blockIdx.x;
+	int by = blockIdx.y;
+
+	int i = bx*BX + tx;
+	int j = by*BY + ty;
+
+	__shared__ float tile[BY][BX];
+
+	if(i >= n || j >= n) return;
+
+	tile[ty][tx] = a[j*n+i];
+
+	__syncthreads();
+	
+	i = by*BY + tx;
+	j = bx*BX + ty;
+
+	b[j*n+i] = tile[tx][ty];
+
+}
+
+__global__ void transpose_v3(float* a,float* b, int n){
+
+	int tx = threadIdx.x;
+	int ty = threadIdx.y;
+
+	int bx = blockIdx.x;
+	int by = blockIdx.y;
+
+	int i = bx*BX + tx;
+	int j = by*BY + ty;
+
+	__shared__ float tile[BY][BX+1]; //Very slight modification to avoid bank conflict in shared mem
+
+	if(i >= n || j >= n) return;
+
+	tile[ty][tx] = a[j*n+i];
+
+	__syncthreads();
+	
+	i = by*BY + tx;
+	j = bx*BX + ty;
+
+	b[j*n+i] = tile[tx][ty];
+
+}
+
+
 int main(int argc,char** argv){
 
-	int n=4096;
+	int n=16384;
 #ifdef UNIT_TEST
-	n = 3;
+	n = 16;
 #endif
 
-	int max_thread_per_axis=32; // max_threads per block is 1024 and sqrt(1024) = 32 
+	int max_thread_per_axis=BX; // max_threads per block is 1024 and sqrt(1024) = 32 
 	int max_mem = n*n;
 
 	dim3 blocks(n/max_thread_per_axis+1,n/max_thread_per_axis+1);
@@ -49,6 +105,12 @@ int main(int argc,char** argv){
 		break;
 	case '1':
 		transpose_v1<<<blocks,threads>>>(a,b,n);
+		break;
+	case '2':
+		transpose_v2<<<blocks,threads>>>(a,b,n);
+		break;
+	case '3':
+		transpose_v3<<<blocks,threads>>>(a,b,n);
 		break;
 	}
 	checkCudaErrors(cudaGetLastError());
