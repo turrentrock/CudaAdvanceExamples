@@ -24,4 +24,10 @@ nv-nsight-cu-cli $nvsightFlags -f ./run 0
 nv-nsight-cu-cli $nvsightFlags -f ./run 1
 nv-nsight-cu-cli $nvsightFlags -f ./run 2
 nv-nsight-cu-cli $nvsightFlags -f ./run 3
+nv-nsight-cu-cli $nvsightFlags -f ./run 4
+#./run 0
+#./run 1
+#./run 2
+#./run 3
+#./run 4
 make clean

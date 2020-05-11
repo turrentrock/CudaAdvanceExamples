@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <time.h>
 
 #include <cudaErrors.h>
 
@@ -79,6 +80,36 @@ __global__ void transpose_v3(float* a,float* b, int n){
 }
 
 
+__global__ void transpose_v4(float* a,float* b, int n){
+
+	int blockIdx_x = blockIdx.y;
+	int blockIdx_y = (blockIdx.x+blockIdx.y)%gridDim.x;
+
+	int tx = threadIdx.x;
+	int ty = threadIdx.y;
+
+	int bx = blockIdx_x;
+	int by = blockIdx_y;
+
+	int i = bx*BX + tx;
+	int j = by*BY + ty;
+
+	__shared__ float tile[BY][BX+1]; //Very slight modification to avoid bank conflict in shared mem
+
+	if(i >= n || j >= n) return;
+
+	tile[ty][tx] = a[j*n+i];
+
+	__syncthreads();
+	
+	i = by*BY + tx;
+	j = bx*BX + ty;
+
+	b[j*n+i] = tile[tx][ty];
+
+}
+
+
 int main(int argc,char** argv){
 
 	int n=16384;
@@ -99,6 +130,8 @@ int main(int argc,char** argv){
 
 	for(int i=0;i<max_mem;i++) {a[i]=i;b[i]=0;}
 
+	clock_t start,stop;
+	start = clock();
 	switch(argv[1][0]){
 	case '0':
 		transpose_v0<<<blocks,threads>>>(a,b,n);
@@ -112,9 +145,16 @@ int main(int argc,char** argv){
 	case '3':
 		transpose_v3<<<blocks,threads>>>(a,b,n);
 		break;
+	case '4':
+		transpose_v4<<<blocks,threads>>>(a,b,n);
+		break;
 	}
 	checkCudaErrors(cudaGetLastError());
 	checkCudaErrors(cudaDeviceSynchronize());
+
+	stop = clock();
+	double timer_seconds = ((double)(stop - start)) / CLOCKS_PER_SEC;
+	std::cout << "Time for v"<<argv[1][0]<<": "<<timer_seconds << " seconds"  << std::endl;
 
 #ifdef UNIT_TEST
 	//Expect everything to be n
