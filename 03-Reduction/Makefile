@@ -13,7 +13,7 @@ LDFLAGS += #$(shell pkg-config opencv --cflags --libs)
 
 OBJS := *.o 
 
-DEFS := -DUNIT_TEST
+DEFS := #-DUNIT_TEST
 
 all:
 	$(MAKE) app

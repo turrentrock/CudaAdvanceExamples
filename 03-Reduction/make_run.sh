@@ -21,5 +21,5 @@ echo $nvsightFlags
 
 make all
 nv-nsight-cu-cli $nvsightFlags -f ./run 0
-#./run 0
+nv-nsight-cu-cli $nvsightFlags -f ./run 1
 make clean
