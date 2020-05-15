@@ -4,7 +4,7 @@ MAKE ?= make
 LIBS := #-lcurand
 
 NVCCFLAGS := -I. \
-			 -I./infra \
+			 -I../infra \
 			 -dlink
 
 BUILT_LIBS := 
