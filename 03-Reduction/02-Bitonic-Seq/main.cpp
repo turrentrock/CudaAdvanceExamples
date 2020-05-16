@@ -50,16 +50,17 @@ void bitonicSort(int lo,int n,int* arr,bool direction) {
 #ifdef UNIT_TEST
 	#define n 2048
 #else
-	#define n 67108864 // 2**26
+	#define n 4096*32 // 2**17
 #endif
 
 int main() {
-
+	srand (time(NULL));
+	
 	int* arr;
 	arr = new int[n];
 	if(!arr)
 		return 1;
-	for(int i=0;i<n;i++) arr[i] = n-i;
+	for(int i=0;i<n;i++) arr[i] =rand() % n;;
 
 	clock_t start,stop;
 	start = clock();

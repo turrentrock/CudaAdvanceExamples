@@ -21,5 +21,6 @@ echo $nvsightFlags
 
 make all
 ./cpu_version
-nv-nsight-cu-cli $nvsightFlags -f ./gpu_version 0
+./gpu_version
+#nv-nsight-cu-cli $nvsightFlags -f ./gpu_version
 make clean
