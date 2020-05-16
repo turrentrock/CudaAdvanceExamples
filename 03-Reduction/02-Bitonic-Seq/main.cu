@@ -10,13 +10,13 @@
 #define THEAD_MAX 1024
 #define WARP_SIZE 32
 
-__device__ void exchange(int i,int j,int* arr){
-	int temp = arr[i];
+__device__ void exchange(int i,int j,float* arr){
+	float temp = arr[i];
 	arr[i] = arr[j];
 	arr[j] = temp;
 }
 
-__device__ void cmp(int i,int j,int* arr,bool direction) {
+__device__ void cmp(int i,int j,float* arr,bool direction) {
 	if((arr[i] > arr[j]) == direction)
 		exchange(i,j,arr);
 }
@@ -31,12 +31,12 @@ __device__ int power2lessthan(int n){
 }
 
 #ifdef UNIT_TEST
-	#define n 4096
+	#define n 2048
 #else
-	#define n 4096*32 // 2**17
+	#define n 67108864 // 2**26 
 #endif
 
-__global__ void bitonicSortStep(int* arr,int step){
+__global__ void bitonicSortStep(float* arr,int step){
 
 	int bx = blockIdx.x;
 	int tx = threadIdx.x;
@@ -44,6 +44,8 @@ __global__ void bitonicSortStep(int* arr,int step){
 	int BX = blockDim.x;
 
 	int i = bx*BX+tx;
+
+	if(i >= n/2) return;
 
 	int direction = (1-(i/step)%2);
 
@@ -55,7 +57,7 @@ __global__ void bitonicSortStep(int* arr,int step){
 		cmp(start,start+s,arr,direction);
 #ifdef UNIT_TEST
 		if(i < n/2)
-			printf("%d - %d %d - %d %d - %d\n",i,start,start+s,arr[start],arr[start+s],direction);
+			printf("%d - %d %d - %f %f - %d\n",i,start,start+s,arr[start],arr[start+s],direction);
 #endif
 
 	}
@@ -65,15 +67,19 @@ int main() {
 	srand (time(NULL));
 
 	int max_threads = THEAD_MAX;
-	int max_blocks = n/max_threads+1;
+	int max_blocks = ceil(n/max_threads);
 
 	dim3 blocks(max_blocks);
 	dim3 threads(max_threads);
 
-	int *arr;
-	checkCudaErrors(cudaMallocManaged((void **)&arr, n*sizeof(*arr)));
+	float *arr;
+	float *d_arr;
+	arr = new float[n];
+
+	checkCudaErrors(cudaMalloc((void **)&d_arr, n*sizeof(*arr)));
 
 	for(int i=0;i<n;i++) arr[i] = rand() % n;
+	checkCudaErrors(cudaMemcpy(d_arr,arr,n*sizeof(*arr),cudaMemcpyHostToDevice));
 
 #ifdef UNIT_TEST
 	//Expect everything to be n
@@ -91,7 +97,7 @@ int main() {
 #ifdef UNIT_TEST
 		std::cout << "Step :"<< i << std::endl;
 #endif
-		bitonicSortStep<<<blocks,threads>>>(arr,i);
+		bitonicSortStep<<<blocks,threads>>>(d_arr,i);
 		checkCudaErrors(cudaGetLastError());
 		checkCudaErrors(cudaDeviceSynchronize());
 #ifdef UNIT_TEST
@@ -104,7 +110,9 @@ int main() {
 #endif
 
 	}
+	stop = clock();
 
+	checkCudaErrors(cudaMemcpy(arr,d_arr,n*sizeof(*arr),cudaMemcpyDeviceToHost));
 #ifdef UNIT_TEST
 	//Expect everything to be n
 		std::cout << "----------------------------" << std::endl;
@@ -114,12 +122,11 @@ int main() {
 		std::cout<<std::endl;
 #endif
 
-	stop = clock();
 	double timer_seconds = ((double)(stop - start)) / CLOCKS_PER_SEC;
 	std::cout << "Time for gpu_version: "<<timer_seconds << " seconds"  << std::endl;
 
 
-	checkCudaErrors(cudaFree(arr));
-
+	checkCudaErrors(cudaFree(d_arr));
+	delete arr;
 	return 0;
 }

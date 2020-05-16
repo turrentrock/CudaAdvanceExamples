@@ -5,7 +5,9 @@ LIBS := #-lcurand
 
 NVCCFLAGS := -I. \
 			 -I../infra \
-			 -dlink
+			 -dlink \
+			 -lineinfo
+
 
 BUILT_LIBS := 
 
@@ -14,6 +16,7 @@ LDFLAGS += #$(shell pkg-config opencv --cflags --libs)
 OBJS := *.o 
 
 DEFS := #-DUNIT_TEST
+		
 
 all:
 	$(MAKE) cpu_app

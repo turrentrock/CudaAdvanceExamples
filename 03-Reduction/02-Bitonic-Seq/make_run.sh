@@ -20,7 +20,15 @@ nvsightFlags+=' '
 echo $nvsightFlags
 
 make all
+
 ./cpu_version
 ./gpu_version
+
+#FOR DEBUG
+
 #nv-nsight-cu-cli $nvsightFlags -f ./gpu_version
+#cuda-memcheck ./gpu_version
+
 make clean
+
+

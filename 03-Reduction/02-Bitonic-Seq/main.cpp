@@ -50,7 +50,7 @@ void bitonicSort(int lo,int n,int* arr,bool direction) {
 #ifdef UNIT_TEST
 	#define n 2048
 #else
-	#define n 4096*32 // 2**17
+	#define n 67108864 // 2**26
 #endif
 
 int main() {
