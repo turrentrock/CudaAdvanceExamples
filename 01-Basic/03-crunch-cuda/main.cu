@@ -29,6 +29,7 @@ int main() {
 	printf("Max Block Dimensions: %i x %i x %i\n", prop.maxGridSize[0], prop.maxGridSize[1], prop.maxGridSize[2]);
 	printf("Warp Size: %i\n", prop.warpSize);
 	printf("Max Threads Per MultiProcessor: %i\n", prop.maxThreadsPerMultiProcessor);
+	printf("MultiProcessor Count: %i\n", prop.multiProcessorCount);
 
 	dim3 n_t(prop.maxThreadsDim[0]);
 	dim3 n_b(prop.maxGridSize[0]);
