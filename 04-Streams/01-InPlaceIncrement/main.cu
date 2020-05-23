@@ -33,6 +33,12 @@ void display(int* arr,int n){
 
 int main(int argc,char** argv) {
 
+#ifdef UNIT_TEST
+	cudaDeviceProp prop;
+	cudaGetDeviceProperties(&prop, 0);
+	std::cout << "Max concurrentKernels: " << prop.concurrentKernels <<std::endl;;
+#endif
+
 	int n = pow(2, 26);
 #ifdef UNIT_TEST
 	n = 4;
